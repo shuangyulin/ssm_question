@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.SelectOptionMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加选项信息记录 -->
+	<insert id="addSelectOption" parameterType="selectOption">
+		insert into t_selectOption(questionObj,optionContent) values 
+		(#{questionObj.titileId},#{optionContent})
+	</insert>
+
+	<!-- 按照查询条件分页查询选项信息记录 -->
+	<select id="querySelectOption" resultMap="selectOptionMap" >
+		select t_selectOption.* from t_selectOption,t_questionInfo ${where} and t_selectOption.questionObj = t_questionInfo.titileId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="selectOptionMap" type="selectOption">
+        <id property="optionId" column="optionId" />
+        <association property="questionObj" column="questionObj" select="com.chengxusheji.mapper.QuestionInfoMapper.getQuestionInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有选项信息记录 -->
+	<select id="querySelectOptionList" resultMap="selectOptionMap" >
+		select t_selectOption.* from t_selectOption,t_questionInfo ${where} and t_selectOption.questionObj = t_questionInfo.titileId
+	</select>
+
+    <!-- 按照查询条件的选项信息记录数 -->
+	<select id="querySelectOptionCount" resultType="int">
+		select count(*) from t_selectOption,t_questionInfo ${where} and t_selectOption.questionObj = t_questionInfo.titileId
+	</select>
+
+	<!-- 根据主键查询某个选项信息记录 -->
+	<select id="getSelectOption" parameterType="int" resultMap="selectOptionMap">
+		select * from t_selectOption where t_selectOption.optionId = #{optionId}
+	</select>
+
+	<!-- 更新选项信息记录 -->
+	<update id="updateSelectOption" parameterType="selectOption">
+		update t_selectOption set questionObj=#{questionObj.titileId},optionContent=#{optionContent} where optionId = #{optionId}
+	</update>
+
+	<!-- 删除选项信息记录 -->
+	<delete id="deleteSelectOption" parameterType="int">
+		delete from t_selectOption where optionId=#{optionId}
+	</delete>
+
+</mapper>

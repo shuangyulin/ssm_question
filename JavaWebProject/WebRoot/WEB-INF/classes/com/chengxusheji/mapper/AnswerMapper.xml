@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.AnswerMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加答卷信息记录 -->
+	<insert id="addAnswer" parameterType="answer">
+		insert into t_answer(selectOptionObj,userObj) values 
+		(#{selectOptionObj.optionId},#{userObj.userInfoname})
+	</insert>
+
+	<!-- 按照查询条件分页查询答卷信息记录 -->
+	<select id="queryAnswer" resultMap="answerMap" >
+		select t_answer.* from t_answer,t_selectOption,t_userInfo ${where} and t_answer.selectOptionObj = t_selectOption.optionId and t_answer.userObj = t_userInfo.userInfoname limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="answerMap" type="answer">
+        <id property="answerId" column="answerId" />
+        <association property="selectOptionObj" column="selectOptionObj" select="com.chengxusheji.mapper.SelectOptionMapper.getSelectOption" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有答卷信息记录 -->
+	<select id="queryAnswerList" resultMap="answerMap" >
+		select t_answer.* from t_answer,t_selectOption,t_userInfo ${where} and t_answer.selectOptionObj = t_selectOption.optionId and t_answer.userObj = t_userInfo.userInfoname
+	</select>
+
+    <!-- 按照查询条件的答卷信息记录数 -->
+	<select id="queryAnswerCount" resultType="int">
+		select count(*) from t_answer,t_selectOption,t_userInfo ${where} and t_answer.selectOptionObj = t_selectOption.optionId and t_answer.userObj = t_userInfo.userInfoname
+	</select>
+
+	<!-- 根据主键查询某个答卷信息记录 -->
+	<select id="getAnswer" parameterType="int" resultMap="answerMap">
+		select * from t_answer where t_answer.answerId = #{answerId}
+	</select>
+
+	<!-- 更新答卷信息记录 -->
+	<update id="updateAnswer" parameterType="answer">
+		update t_answer set selectOptionObj=#{selectOptionObj.optionId},userObj=#{userObj.userInfoname} where answerId = #{answerId}
+	</update>
+
+	<!-- 删除答卷信息记录 -->
+	<delete id="deleteAnswer" parameterType="int">
+		delete from t_answer where answerId=#{answerId}
+	</delete>
+
+</mapper>

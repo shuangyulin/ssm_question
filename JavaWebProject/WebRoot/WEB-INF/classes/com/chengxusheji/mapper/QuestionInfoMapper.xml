@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.QuestionInfoMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加问题信息记录 -->
+	<insert id="addQuestionInfo" parameterType="questionInfo">
+		insert into t_questionInfo(questionPaperObj,titleValue) values 
+		(#{questionPaperObj.paperId},#{titleValue})
+	</insert>
+
+	<!-- 按照查询条件分页查询问题信息记录 -->
+	<select id="queryQuestionInfo" resultMap="questionInfoMap" >
+		select t_questionInfo.* from t_questionInfo,t_surveyInfo ${where} and t_questionInfo.questionPaperObj = t_surveyInfo.paperId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="questionInfoMap" type="questionInfo">
+        <id property="titileId" column="titileId" />
+        <association property="questionPaperObj" column="questionPaperObj" select="com.chengxusheji.mapper.SurveyInfoMapper.getSurveyInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有问题信息记录 -->
+	<select id="queryQuestionInfoList" resultMap="questionInfoMap" >
+		select t_questionInfo.* from t_questionInfo,t_surveyInfo ${where} and t_questionInfo.questionPaperObj = t_surveyInfo.paperId
+	</select>
+
+    <!-- 按照查询条件的问题信息记录数 -->
+	<select id="queryQuestionInfoCount" resultType="int">
+		select count(*) from t_questionInfo,t_surveyInfo ${where} and t_questionInfo.questionPaperObj = t_surveyInfo.paperId
+	</select>
+
+	<!-- 根据主键查询某个问题信息记录 -->
+	<select id="getQuestionInfo" parameterType="int" resultMap="questionInfoMap">
+		select * from t_questionInfo where t_questionInfo.titileId = #{titileId}
+	</select>
+
+	<!-- 更新问题信息记录 -->
+	<update id="updateQuestionInfo" parameterType="questionInfo">
+		update t_questionInfo set questionPaperObj=#{questionPaperObj.paperId},titleValue=#{titleValue} where titileId = #{titileId}
+	</update>
+
+	<!-- 删除问题信息记录 -->
+	<delete id="deleteQuestionInfo" parameterType="int">
+		delete from t_questionInfo where titileId=#{titileId}
+	</delete>
+
+</mapper>
